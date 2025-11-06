@@ -33,10 +33,6 @@ Resources:
       Handler: lambda_function.lambda_handler
       Runtime: python3.12
       CodeUri: CatalogFunction
-      Role:
-        Fn::GetAtt:
-        - CatalogFunctionRole
-        - Arn
       Timeout: 30
       Environment:
         Variables:
