@@ -1,1 +1,47 @@
-"<!DOCTYPE html><html><head><title>My Portfolio</title></head><body><h1>Hello, World!</h1></body></html>" 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Portfolio Store</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <header>
+        <h1>Cloud Portfolio Store</h1>
+    </header>
+
+    <main>
+        <h2>Products</h2>
+        <div id="product-list">
+            <p>Loading products...</p>
+        </div>
+
+        <h2>Test API</h2>
+        <button onclick="testAPI()">Test Backend API</button>
+    </main>
+
+    <footer>
+        &copy; 2025 Cloud Portfolio
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        // Example: populate products dynamically (placeholder)
+        const products = [
+            { product_id: 'p1', name: 'Handmade Mug', price: 150, stock: 10 },
+            { product_id: 'p2', name: 'Wooden Bowl', price: 250, stock: 5 }
+        ];
+
+        const productListDiv = document.getElementById('product-list');
+        productListDiv.innerHTML = products.map(p => `
+            <div style="border:1px solid #ccc; padding:10px; margin:10px; border-radius:5px;">
+                <h3>${p.name}</h3>
+                <p>Price: $${p.price}</p>
+                <p>Stock: ${p.stock}</p>
+            </div>
+        `).join('');
+    </script>
+</body>
+</html>
