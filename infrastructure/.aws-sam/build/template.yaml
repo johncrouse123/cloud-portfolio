@@ -36,7 +36,7 @@ Resources:
       Timeout: 30
       Environment:
         Variables:
-          PRODUCTS_TABLE:
+          DYNAMO_TABLE:
             Ref: ProductsTable
           RDS_HOST:
             Ref: RDSHost
