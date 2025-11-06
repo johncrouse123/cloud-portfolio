@@ -7,6 +7,7 @@ s3_prefix = "cloud-portfolio-backend"
 confirm_changeset = true
 capabilities = "CAPABILITY_IAM"
 image_repositories = []
+parameter_overrides = "RDSHost=\"ubuntucrafts-db.cbeya2y8yewh.af-south-1.rds.amazonaws.com\" RDSDatabase=\"ubuntucrafts_db\""
 
 [default.global.parameters]
 region = "af-south-1"

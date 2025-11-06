@@ -1,24 +1,24 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless backend for Cloud Portfolio (Lambda + API Gateway + DynamoDB)
+Description: Cloud Portfolio Backend - Serverless API + DynamoDB
 Globals:
   Function:
-    Runtime: python3.12
     Timeout: 10
     MemorySize: 128
-    Environment:
-      Variables:
-        DYNAMO_TABLE:
-          Ref: ProductsTable
-        RDS_HOST:
-          Ref: RDSHost
-        RDS_DATABASE:
-          Ref: RDSDatabase
+    Runtime: python3.12
+    Handler: lambda_function.lambda_handler
+Parameters:
+  RDSHost:
+    Type: String
+    Description: RDS endpoint for database connectivity
+  RDSDatabase:
+    Type: String
+    Description: RDS database name
 Resources:
   ProductsTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: Products
+      TableName: ProductsTable
       AttributeDefinitions:
       - AttributeName: product_id
         AttributeType: S
@@ -29,24 +29,45 @@ Resources:
   CatalogFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: catalog-service-python
+      FunctionName: catalog-service-v2
       Handler: lambda_function.lambda_handler
+      Runtime: python3.12
       CodeUri: CatalogFunction
+      Role:
+        Fn::GetAtt:
+        - CatalogFunctionRole
+        - Arn
+      Timeout: 30
+      Environment:
+        Variables:
+          PRODUCTS_TABLE:
+            Ref: ProductsTable
+          RDS_HOST:
+            Ref: RDSHost
+          RDS_DATABASE:
+            Ref: RDSDatabase
       Policies:
-      - AmazonDynamoDBFullAccess
-      - AWSLambdaBasicExecutionRole
-      - AmazonSSMReadOnlyAccess
+      - DynamoDBCrudPolicy:
+          TableName:
+            Ref: ProductsTable
       Events:
         ProductsApi:
           Type: Api
           Properties:
-            Path: /{proxy+}
-            Method: ANY
+            Path: /products
+            Method: GET
     Metadata:
       SamResourceId: CatalogFunction
-  RDSHost:
-    Type: String
-    Default: ubuntucrafts-db.cbeya2y8yewh.af-south-1.rds.amazonaws.com
-  RDSDatabase:
-    Type: String
-    Default: ubuntucrafts
+Outputs:
+  ApiUrl:
+    Description: API Gateway endpoint URL for the Products API
+    Value:
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/products
+  ProductsTableName:
+    Description: DynamoDB table name
+    Value:
+      Ref: ProductsTable
+  LambdaFunctionName:
+    Description: Deployed Lambda function name
+    Value:
+      Ref: CatalogFunction
