@@ -1,40 +1,28 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless backend for Cloud Portfolio (Lambda + API Gateway + DynamoDB)
+Description: Catalog Service (Lambda + DynamoDB + API Gateway)
 
 Globals:
   Function:
-    Runtime: python3.12
     Timeout: 10
+    Runtime: python3.12
     MemorySize: 128
-    Environment:
-      Variables:
-        DYNAMO_TABLE: !Ref ProductsTable
-        RDS_HOST: !Ref RDSHost
-        RDS_DATABASE: !Ref RDSDatabase
 
-# ------------------------
-# Parameters
-# ------------------------
 Parameters:
   RDSHost:
     Type: String
-    Default: ubuntucrafts-db.cbeya2y8yewh.af-south-1.rds.amazonaws.com
-
+    Description: RDS MySQL host
   RDSDatabase:
     Type: String
-    Default: ubuntucrafts
+    Description: RDS database name
 
-# ------------------------
-# Resources
-# ------------------------
 Resources:
 
   # DynamoDB Table
   ProductsTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: Products
+      TableName: ProductsDev   # <-- NEW UNIQUE NAME
       AttributeDefinitions:
         - AttributeName: product_id
           AttributeType: S
@@ -47,13 +35,17 @@ Resources:
   CatalogFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: catalog-service-python
+      FunctionName: CatalogFunction
       Handler: lambda_function.lambda_handler
       CodeUri: ../backend/
+      Environment:
+        Variables:
+          DYNAMO_TABLE: !Ref ProductsTable
+          RDS_HOST: !Ref RDSHost
+          RDS_DATABASE: !Ref RDSDatabase
       Policies:
-        - AmazonDynamoDBFullAccess   # For demo; replace with least-privilege later
-        - AWSLambdaBasicExecutionRole
-        - AmazonSSMReadOnlyAccess
+        - AmazonDynamoDBFullAccess
+        - AmazonRDSFullAccess
       Events:
         ProductsApi:
           Type: Api
